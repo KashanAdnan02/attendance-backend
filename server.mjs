@@ -10,7 +10,7 @@ import cookieParser from "cookie-parser";
 app.use(express.json());
 app.use(cookieParser());
 
-app.use(cors({ origin: "https://attendance-system-client-gilt.vercel.app/", optionsSuccessStatus: 200, credentials: true }));
+app.use(cors({ origin: "*", optionsSuccessStatus: 200, credentials: true }));
 app.use("/api/v1", student_route);
 app.use("/api/v1", attendance_route);
 
