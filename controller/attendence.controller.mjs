@@ -3,48 +3,39 @@ import { student_model } from "../model/student_model.mjs";
 import { v2 as cloudinary } from "cloudinary";
 
 const create_attendance = async (req, res) => {
-  const date = new Date();
-  const { name, roll_id, location } = req.body;
-  const path = req.file.path;
-  cloudinary.uploader.upload(path, async (error, data) => {
-    if (error) {
-      return res.json({
-        message: "Could not upload image to cloud , try again",
-      });
-    }
-    const attendance = await student_model.findOne({ roll_id });
-    if (!attendance) {
-      res.status(400).json({
-        success: false,
-        message: "Wrong Roll Id !",
-      });
-      return;
-    }
-    var hours = date.getHours();
-    var minutes = date.getMinutes();
-    var ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12;
-    hours = hours ? hours : 12;
-    minutes = minutes < 10 ? "0" + minutes : minutes;
-    var strTime = hours + ":" + minutes + " " + ampm;
-    const User = await attendance_model.create({
-      roll_id,
-      name,
-      picture: data.secure_url,
-      location,
-      checkin:
-        date.getDate() +
-        "-" +
-        date.getMonth() +
-        "-" +
-        date.getFullYear() +
-        " " +
-        strTime,
-    });
-    await student_model.updateOne(
-      { _id: attendance._id },
-      {
-        check_in:
+  try {
+
+
+    const date = new Date();
+    const { name, roll_id, location } = req.body;
+    const path = req.file.path;
+    cloudinary.uploader.upload(path, async (error, data) => {
+      if (error) {
+        return res.json({
+          message: "Could not upload image to cloud , try again",
+        });
+      }
+      const attendance = await student_model.findOne({ roll_id });
+      if (!attendance) {
+        res.status(400).json({
+          success: false,
+          message: "Wrong Roll Id !",
+        });
+        return;
+      }
+      var hours = date.getHours();
+      var minutes = date.getMinutes();
+      var ampm = hours >= 12 ? "PM" : "AM";
+      hours = hours % 12;
+      hours = hours ? hours : 12;
+      minutes = minutes < 10 ? "0" + minutes : minutes;
+      var strTime = hours + ":" + minutes + " " + ampm;
+      const User = await attendance_model.create({
+        roll_id,
+        name,
+        picture: data.secure_url,
+        location,
+        checkin:
           date.getDate() +
           "-" +
           date.getMonth() +
@@ -52,14 +43,32 @@ const create_attendance = async (req, res) => {
           date.getFullYear() +
           " " +
           strTime,
-      }
-    );
-    res.json({
-      success: false,
-      message: "Your attendance has mark for today !",
-      User,
+      });
+      await student_model.updateOne(
+        { _id: attendance._id },
+        {
+          check_in:
+            date.getDate() +
+            "-" +
+            date.getMonth() +
+            "-" +
+            date.getFullYear() +
+            " " +
+            strTime,
+        }
+      );
+      res.json({
+        success: false,
+        message: "Your attendance has mark for today !",
+        User,
+      });
     });
-  });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
 };
 
 const checkout = async (req, res) => {
