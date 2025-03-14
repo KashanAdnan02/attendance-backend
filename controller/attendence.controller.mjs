@@ -4,11 +4,11 @@ import { v2 as cloudinary } from "cloudinary";
 
 const create_attendance = async (req, res) => {
   try {
-
-
     const date = new Date();
     const { name, roll_id, location } = req.body;
     const path = req.file.path;
+    console.log(path);
+    
     cloudinary.uploader.upload(path, async (error, data) => {
       if (error) {
         return res.json({
