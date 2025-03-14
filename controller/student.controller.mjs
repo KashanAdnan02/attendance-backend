@@ -7,6 +7,7 @@ import fs from "fs";
 
 const create_student = async (req, res) => {
   try {
+    res.send("kas")
     const { name, roll_id, password, course_name } = req.body;
     const user = await student_model.findOne({ roll_id });
     if (!roll_id && !password) {
