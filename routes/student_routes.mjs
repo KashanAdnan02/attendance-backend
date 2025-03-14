@@ -2,7 +2,7 @@ import student_controller from "../controller/student.controller.mjs";
 import express from "express";
 import authentication from "../middleware/authentication.mjs";
 const student_route = express.Router();
-import { upload } from "../utils/multer.mjs";
+import upload from "../utils/multer.mjs";
 
 student_route.post(
   "/register",

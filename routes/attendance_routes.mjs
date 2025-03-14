@@ -3,7 +3,7 @@ import authentication from "../middleware/authentication.mjs";
 import express from "express";
 
 const attendance_route = express.Router();
-import { upload } from "../utils/multer.mjs";
+import upload from "../utils/multer.mjs";
 
 attendance_route.post(
   "/checkin",
