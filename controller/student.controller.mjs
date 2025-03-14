@@ -6,67 +6,74 @@ import { v2 as cloudinary } from "cloudinary";
 import fs from "fs";
 
 const create_student = async (req, res) => {
-  const { name, roll_id, password, course_name } = req.body;
-  const user = await student_model.findOne({ roll_id });
-  if (!roll_id && !password) {
-    res.status(400).json({ success: false, msg: "Enter credentials!" });
-    return;
-  }
-  if (!roll_id) {
-    res
-      .status(400)
-      .json({ success: false, msg: "Enter roll id to create student!" });
-    return;
-  }
-  if (!password) {
-    res
-      .status(400)
-      .json({ success: false, msg: "Enter password to create student!" });
-    return;
-  }
-  if (!name) {
-    res
-      .status(400)
-      .json({ success: false, msg: "Enter name to create student!" });
-    return;
-  }
-  if (!course_name) {
-    res
-      .status(400)
-      .json({ success: false, msg: "Enter course name to create student!" });
-    return;
-  }
-  if (password < 6) {
-    res.status(400).json({
-      success: false,
-      msg: "Password should'nt be less than 6 characters!",
-    });
-    return;
-  }
-  if (user) {
-    res.status(400).json({
-      success: false,
-      msg: "Roll id already exists!",
-    });
-    return;
-  }
-  const path = req.file.path;
-  cloudinary.uploader.upload(path, async (error, data) => {
-    if (error) {
-      return res.json({
-        message: "Could not upload image to cloud , try again",
-      });
+  try {
+    const { name, roll_id, password, course_name } = req.body;
+    const user = await student_model.findOne({ roll_id });
+    if (!roll_id && !password) {
+      res.status(400).json({ success: false, msg: "Enter credentials!" });
+      return;
     }
-    const User = await student_model.create({
-      name,
-      roll_id,
-      password,
-      picture: data.secure_url,
-      course_name,
+    if (!roll_id) {
+      res
+        .status(400)
+        .json({ success: false, msg: "Enter roll id to create student!" });
+      return;
+    }
+    if (!password) {
+      res
+        .status(400)
+        .json({ success: false, msg: "Enter password to create student!" });
+      return;
+    }
+    if (!name) {
+      res
+        .status(400)
+        .json({ success: false, msg: "Enter name to create student!" });
+      return;
+    }
+    if (!course_name) {
+      res
+        .status(400)
+        .json({ success: false, msg: "Enter course name to create student!" });
+      return;
+    }
+    if (password < 6) {
+      res.status(400).json({
+        success: false,
+        msg: "Password should'nt be less than 6 characters!",
+      });
+      return;
+    }
+    if (user) {
+      res.status(400).json({
+        success: false,
+        msg: "Roll id already exists!",
+      });
+      return;
+    }
+    const path = req.file.path;
+    cloudinary.uploader.upload(path, async (error, data) => {
+      if (error) {
+        return res.json({
+          message: "Could not upload image to cloud , try again",
+        });
+      }
+      const User = await student_model.create({
+        name,
+        roll_id,
+        password,
+        picture: data.secure_url,
+        course_name,
+      });
+      sendToken(User, 200, res);
+      fs.unlinkSync(path);
     });
-    sendToken(User, 200, res);
-    fs.unlinkSync(path);
-  });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    })
+  }
 };
 
 const login_student = async (req, res) => {
