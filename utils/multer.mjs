@@ -5,9 +5,9 @@ const storage = multer.diskStorage({
     cb(null, './uploads'); // Ensure this directory exists and is writable
   },
   filename: function (req, file, cb) {
-    cb(null, file.fieldname + '-' + Date.now());
+    cb(null, `${new Date().getTime()}-${file.originalname}`);
   }
 });
 
 const upload = multer({ storage: storage });
-export { upload };
+export {upload};
